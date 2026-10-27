@@ -16,7 +16,8 @@
     "dotenv": "*",
     "express": "*",
     "jsonwebtoken": "*",
-    "mongoose": "*"
+    "mongoose": "*",
+    "multer": "^2.5.0"
   },
   "devDependencies": {
     "nodemon": "*"
