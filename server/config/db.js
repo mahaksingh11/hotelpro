@@ -9,5 +9,12 @@ const connectDB = async () => {
     process.exit(1); // stop the server if the DB can't connect
   }
 };
+mongoose.connection.on("disconnected", () => {
+  console.log("MongoDB disconnected");
+});
+
+mongoose.connection.on("error", (err) => {
+  console.log("MongoDB error:", err.message);
+});
 
 module.exports = connectDB;
