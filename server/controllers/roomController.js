@@ -26,7 +26,7 @@ const addRoom = async (req, res) => {
       description,
     });
 
-    const room = await newRoom.save(); // created using .save() as the task requires
+    const room = await newRoom.save();
     res.status(201).json({ success: true, message: "Room added successfully", room });
   } catch (error) {
     console.log(error);
@@ -34,7 +34,7 @@ const addRoom = async (req, res) => {
   }
 };
 
-// GET /api/rooms  (public - used on Home page and UserHome)
+// GET /api/rooms  (public)
 const getAllRooms = async (req, res) => {
   try {
     const rooms = await Room.find().sort({ roomNumber: 1 });
@@ -45,7 +45,41 @@ const getAllRooms = async (req, res) => {
   }
 };
 
-// GET /api/rooms/:id  (public - single room details)
+// GET /api/rooms/available?fromDate=YYYY-MM-DD&toDate=YYYY-MM-DD  (public)
+const getAvailableRooms = async (req, res) => {
+  try {
+    const { fromDate, toDate } = req.query;
+    if (!fromDate || !toDate) {
+      return res.status(400).json({ success: false, message: "fromDate and toDate are required" });
+    }
+
+    const from = new Date(fromDate);
+    const to = new Date(toDate);
+    if (isNaN(from) || isNaN(to) || to < from) {
+      return res.status(400).json({ success: false, message: "Invalid date range" });
+    }
+
+    const rooms = await Room.find().sort({ roomNumber: 1 });
+
+    // Keep only rooms with no active booking overlapping the chosen dates
+    const available = rooms.filter(
+      (room) =>
+        !room.currentBookings.some(
+          (b) =>
+            b.status === "booked" &&
+            new Date(b.fromDate) <= to &&
+            new Date(b.toDate) >= from
+        )
+    );
+
+    res.status(200).json({ success: true, count: available.length, rooms: available });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ success: false, message: "Internal server error" });
+  }
+};
+
+// GET /api/rooms/:id  (public)
 const getRoomById = async (req, res) => {
   try {
     const room = await Room.findById(req.params.id);
@@ -54,9 +88,8 @@ const getRoomById = async (req, res) => {
     }
     res.status(200).json({ success: true, room });
   } catch (error) {
-    // Invalid ID format also lands here
     res.status(404).json({ success: false, message: "Room not found" });
   }
 };
 
-module.exports = { addRoom, getAllRooms, getRoomById };
+module.exports = { addRoom, getAllRooms, getAvailableRooms, getRoomById };
