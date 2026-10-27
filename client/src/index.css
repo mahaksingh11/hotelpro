@@ -46,3 +46,14 @@ body {
 .user-hero {
   background: linear-gradient(90deg, #6a11cb, #2575fc);
 }
+/* Admin tabs */
+.admin-tabs .nav-link {
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: #555;
+}
+
+.admin-tabs .nav-link.active {
+  color: #2575fc;
+  font-weight: 600;
+}
