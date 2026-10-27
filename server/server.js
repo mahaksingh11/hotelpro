@@ -15,7 +15,7 @@ app.get("/", (req, res) => {
 });
 
 // Routes will be added here, e.g.
-// app.use("/api/users", require("./routes/userRoutes"));
+ app.use("/api/users", require("./routes/userRoutes"));
 
 // Start server after DB connects
 const PORT = process.env.PORT || 5000;
